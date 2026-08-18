@@ -1,0 +1,17 @@
+# @aitechmei/dsh-feishu — Feishu/Lark messaging bot over dsh-base.
+# Applied after dsh-base's insert. The base keeps the agent loop, tools,
+# persistence, sandbox, and model adapters in the host plane, so agents the
+# bot creates read that shared composition. A deployment composes the bot as:
+#   dsh plugin --profile feishu add @aitechmei/dsh-feishu
+# and overrides credentials and access policy in the profile's own patch layer.
+
+- insert:
+    - id: feishu
+      name: '@aitechmei/dsh-feishu'
+      config:
+        # Credentials and access policy belong to the profile's patch layer;
+        # these are the channel defaults. Set appId/appSecret before use.
+        domain: feishu
+        dmPolicy: allowlist
+        groupPolicy: allowlist
+        requireMention: true
