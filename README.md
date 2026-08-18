@@ -120,6 +120,45 @@ Indirectly, through the user messages it admits. The channel submits each admitt
 
 Independently, through the agent loop. The channel registers nothing that pins or replaces a request prefix; per-chat sessions keep their own history and the adapter's cache behavior is unchanged.
 
+## Model Source (host-defined)
+
+The reply model is **not** managed by this package — it is whatever the host
+profile's *default model* resolves to. The channel merely admits messages into
+the agent loop and reuses the deployment's composed `agent-default-model`, so
+there is **no per-channel model field to configure here**.
+
+> [!IMPORTANT]
+> In the current dsh layout the `agent-default-model` plugin's *config* layer
+> wins over the global `settings.yaml` `agent-default-model` section. If you set
+> a third-party provider (e.g. volcengine) only in `settings.yaml`, a fresh
+> profile may still resolve to dsh-base's default `deepseek-official` (which has
+> no credential unless you also export its key), so the bot would emit a
+> `CrossMark` instead of a reply. To use your own model, **override both rows in
+> the profile's own patch layer** (`$DSH_HOME/profiles/<name>/cordis.patch.yml`):
+
+```yaml
+- id: llm-pi-ai
+  config:
+    providers:
+      volcengine:
+        displayName: volcengine
+        apiKeyEnv: VOLCENGINE_API_KEY
+        api: openai-responses
+        baseURL: https://ark.cn-beijing.volces.com/api/coding/v3
+        models:
+          - id: ark-code-latest
+            name: ark-code-latest
+- id: agent-default-model
+  config:
+    provider: volcengine
+    model: ark-code-latest
+```
+
+Same idea for any provider (deepseek, openai, …): set the provider metadata
+under `llm-pi-ai` and point `agent-default-model` at it. This is tracked as a
+host-side convenience gap; once the host honors the global `settings.yaml`
+default, the override becomes optional.
+
 ## Known Limitations and Deferred Work
 
 - **Markdown rendering is best-effort** — `post` + `md` renders headings, bold, lists and fenced code; **table rendering is not promised** (it may render or fall back to plain text, and is never force-downgraded). Streaming card replies, images, and interactive cards are not implemented; over-long replies are delivered as one large text message rather than streamed or chunked.

@@ -25,8 +25,8 @@ export const REACTION_CACHE_SIZE = 1024
 export type ReactionOutcome = 'success' | 'failure'
 
 /**
- * Decide whether reactions are active from the environment. Mirrors hermes:
- * the feature is on unless the env var is an explicit off value.
+ * Decide whether reactions are active from the environment. The feature is on
+ * unless the env var is set to an explicit off value.
  */
 export function reactionsEnabledFromEnv(env: NodeJS.ProcessEnv = process.env): boolean {
   const value = (env[FEISHU_REACTIONS_ENV] ?? 'true').trim().toLowerCase()

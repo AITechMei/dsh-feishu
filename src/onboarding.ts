@@ -1,8 +1,8 @@
 /**
  * Feishu / Lark device-code onboarding: the official (reverse-engineered)
- * flow used by hermes to auto-create a PersonalAgent app from a phone scan.
- * Wraps init -> begin -> poll -> probe, reusing the runtime Feishu client for
- * the credential probe. Best-effort: manual entry remains the durable path.
+ * flow to auto-create a PersonalAgent app from a phone scan. Wraps
+ * init -> begin -> poll -> probe, reusing the runtime Feishu client for the
+ * credential probe. Best-effort: manual entry remains the durable path.
  * @module @aitechmei/dsh-feishu
  */
 

@@ -118,6 +118,38 @@ dsh-feishu-setup --profile feishu-test --json --yes
 
 独立地，通过 agent 循环体现。该渠道不注册任何锁定或替换请求前缀的内容；每个聊天的会话各自保留自己的历史，适配器的缓存行为不变。
 
+## 模型来源（由宿主决定）
+
+回复模型**不由本包管理**——它取决于宿主 profile 解析出的**默认模型**。本渠道只把入站消息送进 agent 循环，并复用部署合成后的
+`agent-default-model`，因此这里**没有可配置的按渠道模型字段**。
+
+> [!IMPORTANT]
+> 在当前 dsh 布局里，`agent-default-model` 插件的**config 层优先于**全局 `settings.yaml` 的 `agent-default-model` 段。
+> 如果你只在 `settings.yaml` 配了第三方 provider（如 volcengine），新建的 profile 仍可能解析到 dsh-base 默认的
+> `deepseek-official`（在未导出其 key 时会因无凭据无法回复，bot 弹出 `CrossMark` 而非回复）。
+> 要使用你自己的模型，**在 profile 自己的 patch 层覆盖两行**（`$DSH_HOME/profiles/<name>/cordis.patch.yml`）：
+
+```yaml
+- id: llm-pi-ai
+  config:
+    providers:
+      volcengine:
+        displayName: volcengine
+        apiKeyEnv: VOLCENGINE_API_KEY
+        api: openai-responses
+        baseURL: https://ark.cn-beijing.volces.com/api/coding/v3
+        models:
+          - id: ark-code-latest
+            name: ark-code-latest
+- id: agent-default-model
+  config:
+    provider: volcengine
+    model: ark-code-latest
+```
+
+任意 provider（deepseek、openai 等）同理：把 provider 元数据填到 `llm-pi-ai`，再把 `agent-default-model` 指向它。
+这是宿主侧便利性的缺口，已记录；待宿主优先采纳全局 `settings.yaml` 默认后，该覆盖变为可选。
+
 ## 已知限制与延后工作
 
 - **Markdown 渲染尽力而为** —— `post` + `md` 渲染标题、加粗、列表和围栏代码；**表格渲染不作承诺**（可能渲染，也可能降级为纯文本，但绝不强制降级）。流式卡片回复、图片、交互式卡片未实现；超长回复作为单条大文本发出，而非流式或分片。
