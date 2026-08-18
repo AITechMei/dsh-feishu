@@ -53,5 +53,23 @@
     "@types/node": "^22.0.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AITechMei/dsh-feishu.git"
+  },
+  "keywords": [
+    "feishu",
+    "lark",
+    "dsh",
+    "deepseek-harness",
+    "bot",
+    "channel"
+  ],
+  "engines": {
+    "node": ">=22"
   }
 }
