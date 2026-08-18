@@ -7,17 +7,25 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import Schema from '@deepseek-ai/schemastery'
-import { createFeishuClient, createFeishuTransport, resolveBotOpenId } from './client.ts'
+import {
+  createFeishuClient,
+  createFeishuTransport,
+  resolveBotOpenId,
+} from './client.ts'
 import { createMessageHandler } from './handler.ts'
+import { ReactionLifecycle, resolveReactionsEnabled } from './reaction.ts'
 import { installReplyRelay } from './relay.ts'
 import { ChatSessions } from './sessions.ts'
 import type { FeishuConfig } from './types.ts'
 
 export type * from './types.ts'
 export {
+  addMessageReaction,
   createFeishuClient,
   createFeishuTransport,
+  removeMessageReaction,
   resolveBotOpenId,
+  sendMarkdownMessage,
   sendTextMessage,
   type LarkMessageReceiveEvent,
 } from './client.ts'
@@ -44,6 +52,8 @@ export const Config: Schema<FeishuConfig> = Schema.object({
   provider: Schema.string(),
   model: Schema.string(),
   cwd: Schema.string(),
+  brandHeader: Schema.string(),
+  reactions: Schema.boolean(),
 })
 
 /**
@@ -59,17 +69,26 @@ export function apply(ctx: Context, config: FeishuConfig): void {
     ...(config.cwd === undefined ? {} : { cwd: config.cwd }),
     resolveDefaultModel: () => ctx.get('agentDefaultModel')?.currentSelection(),
   })
+  const reactions = new ReactionLifecycle(resolveReactionsEnabled(config.reactions))
 
   let botOpenId: string | undefined
   let transport: { start: () => Promise<void>; stop: () => Promise<void> } | undefined
 
   ctx.effect(() => {
-    const stopRelay = installReplyRelay({ ctx, client, sessions })
+    const stopRelay = installReplyRelay({
+      ctx,
+      client,
+      sessions,
+      reactions,
+      brandHeader: config.brandHeader,
+    })
     const handler = createMessageHandler({
       ctx,
       config,
       sessions,
       botOpenId: () => botOpenId,
+      client,
+      reactions,
     })
     transport = createFeishuTransport(config, handler, {
       onReady: () => {

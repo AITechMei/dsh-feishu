@@ -78,7 +78,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined, client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     await handler(event({ chat_type: 'p2p', chat_id: 'ou_chat' }))
     expect(followups).toHaveLength(1)
     const message = followups[0] as { content: [{ type: string; text: string }]; source: { kind: string; chatId: string } }
@@ -90,7 +90,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined, client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     const post = event({
       chat_type: 'p2p',
       message_type: 'post',
@@ -104,7 +104,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined, client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     await handler(event({ message_type: 'image', content: '{}' }))
     await handler(event({ message_type: 'text', content: '{"text":"  "}' }))
     expect(followups).toHaveLength(0)
@@ -114,7 +114,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined, client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     await handler(event({ message_type: 'text', content: '{not-json' }))
     await handler(event({ message_type: 'post', content: '{also-not-json' }))
     expect(followups).toHaveLength(0)
@@ -124,7 +124,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => undefined, client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     const noParts = event({ message_type: 'post', content: JSON.stringify({ zh_cn: { title: 't', content: [[{ tag: 'at', text: 'x' }]] } }) })
     await handler(noParts)
     const nonArray = event({ message_type: 'post', content: JSON.stringify({ zh_cn: { title: 't', content: 'nope' } }) })
@@ -136,7 +136,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => 'ou_bot' })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => 'ou_bot', client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     await handler(event({ message_type: 'text', content: '{"text":123}' }))
     const badLine = event({ message_type: 'post', content: JSON.stringify({ zh_cn: { title: 't', content: ['not-an-array', 'also-not'] } }) })
     await handler(badLine)
@@ -147,7 +147,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => 'ou_bot' })
+    const handler = createMessageHandler({ ctx, config: baseConfig, sessions: sessions as never, botOpenId: () => 'ou_bot', client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     const notAllowed = event({ chat_type: 'p2p', chat_id: 'ou_chat' })
     notAllowed.sender = { sender_type: 'user', sender_id: { open_id: 'ou_stranger' } }
     await handler(notAllowed)
@@ -161,7 +161,7 @@ describe('createMessageHandler text extraction', () => {
     const followups: unknown[] = []
     const sessions = { agentFor: async () => ({ followup: (m: unknown) => followups.push(m) }) }
     const ctx = { logger: { info: () => {} } } as never
-    const handler = createMessageHandler({ ctx, config: { ...baseConfig, groupPolicy: 'open', requireMention: false }, sessions: sessions as never, botOpenId: () => 'ou_bot' })
+    const handler = createMessageHandler({ ctx, config: { ...baseConfig, groupPolicy: 'open', requireMention: false }, sessions: sessions as never, botOpenId: () => 'ou_bot', client: {} as never, reactions: { start: async () => {}, finish: async () => {} } as never })
     const g = event({ chat_type: 'group', chat_id: 'oc_any' })
     g.sender = { sender_type: 'user' }
     await handler(g)

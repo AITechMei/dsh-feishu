@@ -43,6 +43,10 @@ export interface FeishuConfig {
   model?: string
   /** Working directory for created sessions; absent uses the host cwd. */
   cwd?: string
+  /** Brand header prepended to long/rich replies. An empty string disables it. */
+  brandHeader?: string
+  /** Whether to show the "thinking" Typing/CrossMark reaction. Defaults to true. */
+  reactions?: boolean
 }
 
 declare module '@deepseek-ai/dsh-llm' {

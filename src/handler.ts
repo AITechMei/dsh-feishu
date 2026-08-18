@@ -7,7 +7,8 @@
 
 import type { Context } from '@deepseek-ai/cordis'
 import { createUserMessage } from '@deepseek-ai/dsh-llm'
-import type { LarkMessageReceiveEvent } from './client.ts'
+import type { FeishuClient, LarkMessageReceiveEvent } from './client.ts'
+import type { ReactionLifecycle } from './reaction.ts'
 import type { ChatSessions } from './sessions.ts'
 import type { FeishuConfig } from './types.ts'
 
@@ -91,8 +92,10 @@ export function createMessageHandler(options: {
   config: FeishuConfig
   sessions: ChatSessions
   botOpenId: () => string | undefined
+  client: FeishuClient
+  reactions: ReactionLifecycle
 }): (event: LarkMessageReceiveEvent) => Promise<void> {
-  const { ctx, config, sessions, botOpenId } = options
+  const { ctx, config, sessions, botOpenId, client, reactions } = options
   return async (event) => {
     const text = extractText(event.message.message_type, event.message.content)
     if (text === undefined || text.trim().length === 0) return
@@ -100,6 +103,10 @@ export function createMessageHandler(options: {
     const senderOpenId = event.sender.sender_id?.open_id
     if (senderOpenId === undefined) return
     const chatId = event.message.chat_id
+    // "Thinking" reaction while the agent works. Await before admitting so
+    // the handle is cached before a fast-returning turn/end (prevents a
+    // Typing landing after its badge was already removed).
+    await reactions.start(client, event.message.message_id)
     const agent = await sessions.agentFor(chatId)
     const message = createUserMessage({
       content: [{ type: 'text', text }],
