@@ -21,7 +21,8 @@
     "lib",
     "cordis.patch.yml",
     "README.md",
-    "README.zh.md"
+    "README.zh.md",
+    "bin"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
@@ -35,22 +36,25 @@
   "license": "MIT",
   "dependencies": {
     "@deepseek-ai/schemastery": "^3.18.1",
-    "@larksuiteoapi/node-sdk": "1.73.0"
+    "@larksuiteoapi/node-sdk": "1.73.0",
+    "qrcode": "^1.5.4",
+    "yaml": "^2.9.0"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/dsh-agent": "^0.1.0-rc.7",
+    "@deepseek-ai/dsh-invariants": "^0.1.0-rc.7",
     "@deepseek-ai/dsh-llm": "^0.1.0-rc.7",
-    "@deepseek-ai/dsh-session": "^0.1.0-rc.7",
-    "@deepseek-ai/dsh-invariants": "^0.1.0-rc.7"
+    "@deepseek-ai/dsh-session": "^0.1.0-rc.7"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/dsh-agent": "^0.1.0-rc.7",
+    "@deepseek-ai/dsh-invariants": "^0.1.0-rc.7",
     "@deepseek-ai/dsh-llm": "^0.1.0-rc.7",
     "@deepseek-ai/dsh-session": "^0.1.0-rc.7",
-    "@deepseek-ai/dsh-invariants": "^0.1.0-rc.7",
     "@types/node": "^22.0.0",
+    "@types/qrcode": "^1.5.6",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8"
   },
@@ -71,5 +75,8 @@
   ],
   "engines": {
     "node": ">=22"
+  },
+  "bin": {
+    "dsh-feishu-setup": "bin/dsh-feishu-setup.mjs"
   }
 }
